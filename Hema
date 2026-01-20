@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemadharishini | Portfolio & Marketplace</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#fdb836',
+                        primaryHover: '#e5a52d',
+                        textDark: '#1a1e26',
+                        textLight: '#5e677a',
+                        bgColor: '#f9faff',
+                        borderLight: 'rgba(253, 184, 54, 0.2)',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'scroll': 'scroll 25s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slideInLeft': 'slideInLeft 0.8s ease-out forwards',
+                        'fadeInUp': 'fadeInUp 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        scroll: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(1deg)' },
+                        },
+                        slideInLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-nav {
+                @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-lg;
+            }
+            .glass-card {
+                @apply bg-white/70 backdrop-blur-[20px] border border-white/40 shadow-[0_20px_50px_rgba(253,184,54,0.12)];
+            }
+            .info-card-shadow {
+                @apply shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(253,184,54,0.12)];
+            }
+            .product-card-hover {
+                @apply transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-primary;
+            }
+            .enquiry-glow::before {
+                content: '';
+                @apply absolute -top-[15px] -right-[15px] w-[50px] h-[50px] bg-primary rounded-full -z-10 blur-[20px] opacity-50;
+            }
+            .profile-shadow {
+                box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
+            }
+            .value-card-hover {
+                @apply transition-all duration-500 hover:-translate-y-[10px] hover:bg-white hover:border-primary hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)];
+            }
+        }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-bgColor font-outfit text-textDark overflow-x-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- SHARED COMPONENTS ---
+
+        const Nav = ({ currentPage, setPage }) => {
+            const [isOpen, setIsOpen] = useState(false);
+
+            const navLinks = [
+                { name: 'Home', icon: 'fa-home', id: 'home' },
+                { name: 'About', icon: 'fa-user', id: 'about' },
+                { name: 'Marketplace', icon: 'fa-shopping-bag', id: 'marketplace' },
+                { name: 'Contact', icon: 'fa-paper-plane', id: 'contact' }
+            ];
+
+            const handleNavClick = (id) => {
+                setPage(id);
+                setIsOpen(false);
+                window.scrollTo(0, 0);
+            };
+
+            return (
+                <nav className="fixed top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl z-[1000]">
+                    <div className="glass-nav rounded-full px-8 py-4 flex justify-between items-center relative">
+                        <a href="#" onClick={() => handleNavClick('home')} className="flex items-center gap-3 font-extrabold text-xl">
+                            <img src="https://uploads.onecompiler.io/3zky9aw9p/44b5epqjq/IMG-20260120-WA0005.jpg" alt="Logo" className="w-9 h-9 rounded-full border-2 border-primary" />
+                            Hemadharishini<span className="text-primary">.</span>
+                        </a>
+
+                        <ul className="hidden md:flex gap-8 list-none font-medium items-center">
+                            {navLinks.map(link => (
+                                <li key={link.id}>
+                                    <button 
+                                        onClick={() => handleNavClick(link.id)}
+                                        className={`flex items-center gap-2 transition-colors ${currentPage === link.id ? 'text-primary' : 'text-textLight hover:text-primary'}`}
+                                    >
+                                        <i className={`fas ${link.icon}`}></i>
+                                        {link.name}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <button className="md:hidden text-2xl text-textDark focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
+                            <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'}`}></i>
+                        </button>
+
+                        {isOpen && (
+                            <div className="absolute top-20 left-0 w-full bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 flex flex-col gap-4 md:hidden animate-fadeInUp">
+                                {navLinks.map(link => (
+                                    <button 
+                                        key={link.id}
+                                        onClick={() => handleNavClick(link.id)}
+                                        className={`flex items-center gap-4 p-4 rounded-xl text-lg font-semibold ${currentPage === link.id ? 'bg-primary/10 text-primary' : 'text-textLight'}`}
+                                    >
+                                        <i className={`fas ${link.icon}`}></i>
+                                        {link.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </nav>
+            );
+        };
+
+        const Footer = ({ setPage }) => (
+            <footer className="py-12 px-[8%] text-center bg-white border-t border-gray-100 mt-auto">
+                <div className="font-bold text-xl mb-5 underline decoration-primary decoration-4 underline-offset-4 cursor-pointer" onClick={() => {setPage('home'); window.scrollTo(0,0)}}>
+                    Hema<span className="text-primary">dharishini</span>
+                </div>
+                <p className="text-textLight text-sm mb-6">© 2025 Hemadharishini. All rights reserved. Crafted with Passion.</p>
+                <div className="flex justify-center gap-5">
+                    <a href="#" className="text-textLight hover:text-primary text-xl transition-colors"><i className="fab fa-linkedin"></i></a>
+                    <a href="#" className="text-textLight hover:text-primary text-xl transition-colors"><i className="fab fa-github"></i></a>
+                    <a href="#" className="text-textLight hover:text-primary text-xl transition-colors"><i className="fab fa-instagram"></i></a>
+                </div>
+            </footer>
+        );
+
+        // --- PAGE: HOME ---
+
+        const Home = ({ setPage }) => {
+            const skills = [
+                { name: 'HTML', icon: 'fa-html5' }, { name: 'CSS', icon: 'fa-css3-alt' },
+                { name: 'JavaScript', icon: 'fa-js' }, { name: 'React', icon: 'fa-react' },
+                { name: 'Python', icon: 'fa-python' }, { name: 'MySQL', icon: 'fa-database' },
+                { name: 'Git', icon: 'fa-git-alt' }
+            ];
+
+            return (
+                <div className="animate-fadeInUp">
+                    <section className="min-h-screen flex flex-col justify-center items-center text-center px-5 pt-20">
+                        <p className="uppercase tracking-[2px] text-textLight mb-4 text-sm font-semibold">Welcome to my portfolio</p>
+                        <h1 className="text-5xl md:text-7xl font-extrabold max-w-4xl leading-[1.1] mb-6">
+                            Crafting Clean & <span className="text-primary">Impactful</span> Digital Experiences
+                        </h1>
+                        <p className="text-lg text-textLight mb-10">Frontend Developer | UI Enthusiast | Tech Learner</p>
+                        
+                        <div className="flex flex-wrap justify-center gap-5 mb-16">
+                            <button onClick={() => setPage('marketplace')} className="bg-primary text-white px-8 py-4 rounded-full font-bold shadow-[0_10px_20px_rgba(253,184,54,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(253,184,54,0.4)] transition-all">Explore Marketplace</button>
+                            <button onClick={() => setPage('about')} className="border-2 border-gray-200 px-8 py-4 rounded-full font-bold hover:border-primary hover:text-primary transition-all">About Me</button>
+                        </div>
+
+                        <div className="flex gap-12 md:gap-24">
+                            {[{ label: 'Years Learning', val: '1+' }, { label: 'Projects', val: '10+' }, { label: 'Technologies', val: '5+' }].map((stat, i) => (
+                                <div key={i}>
+                                    <h3 className="text-3xl font-bold text-primary">{stat.val}</h3>
+                                    <p className="text-sm text-textLight">{stat.label}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <div className="py-16 bg-white overflow-hidden whitespace-nowrap relative border-y border-gray-50">
+                        <div className="inline-block animate-scroll">
+                            {[...skills, ...skills].map((skill, i) => (
+                                <span key={i} className="inline-flex items-center gap-3 mx-10 text-2xl font-semibold text-gray-300 hover:text-primary transition-all cursor-default">
+                                    <i className={`fab ${skill.icon} fas`}></i> {skill.name}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    <section id="about-preview" className="max-w-6xl mx-auto my-24 px-5">
+                        <div className="grid md:grid-cols-[1fr_1.5fr] gap-12 md:gap-20 items-center">
+                            <img src="https://uploads.onecompiler.io/3zky9aw9p/44b5epqjq/IMG-20260120-WA0005.jpg" alt="Profile" className="w-full rounded-[30px] shadow-2xl animate-float" />
+                            <div>
+                                <h2 className="text-4xl font-extrabold mb-8 relative inline-block after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-12 after:h-1 after:bg-primary">Quick Look</h2>
+                                <p className="text-textLight text-lg mb-6 leading-relaxed">
+                                    I am a passionate Frontend Developer dedicated to building aesthetically pleasing and highly functional user interfaces. My journey in tech is driven by curiosity and a relentless desire to bridge the gap between design and code.
+                                </p>
+                                <button onClick={() => setPage('about')} className="bg-textDark text-white px-6 py-3 rounded-xl font-bold hover:bg-primary transition-all">View Full Story</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        // --- PAGE: ABOUT ---
+
+        const About = ({ setPage }) => {
+            return (
+                <div className="min-h-screen animate-fadeInUp">
+                    {/* --- ABOUT HERO SECTION --- */}
+                    <section className="pt-[180px] pb-24 px-[8%] grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-20 items-center max-w-[1300px] mx-auto">
+                        <div className="animate-float">
+                            <div className="profile-shadow relative w-full aspect-square rounded-[40px] bg-gradient-to-br from-white to-[#e6e6e6] overflow-hidden group">
+                                <div 
+                                    className="w-full h-full bg-[url('https://uploads.onecompiler.io/3zky9aw9p/44b5epqjq/IMG-20260120-WA0005.jpg')] bg-center bg-cover transition-transform duration-500 group-hover:scale-105"
+                                    aria-label="Profile Image"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div className="bio-content lg:text-left text-center">
+                            <h4 className="text-primary uppercase tracking-[3px] text-[0.9rem] font-semibold mb-4">My Journey</h4>
+                            <h1 className="text-4xl lg:text-[3.5rem] font-bold leading-[1.2] mb-8">
+                                I am Hemadharishini, <br />a Digital Architect.
+                            </h1>
+                            
+                            <div className="text-[1.15rem] text-textLight space-y-5 text-justify">
+                                <p>
+                                    Hello! I am a passionate Frontend Developer and UI Enthusiast with a deep-rooted love for clean aesthetics and functional design. Over the past year, I have dedicated myself to mastering the art of web development, specializing in building responsive, user-centric interfaces using React, Tailwind CSS, and Modern JavaScript. 
+                                </p>
+                                <p>
+                                    My journey in technology is driven by a simple philosophy: "Simplicity is the ultimate sophistication." Whether I am writing Python scripts for data analysis or architecting complex frontend components, I strive for precision and scalability. I believe that every line of code should contribute to a seamless user story. Beyond the screen, I am a lifelong learner, constantly exploring new frameworks and design patterns to stay at the forefront of the ever-evolving tech landscape.
+                                </p>
+                            </div>
+
+                            <div className="border-l-4 border-primary pl-6 my-10 italic text-[1.3rem] text-textDark text-left">
+                                "My goal is to bridge the gap between complex logic and elegant human experiences."
+                            </div>
+
+                            <button onClick={() => setPage('contact')} className="inline-flex items-center font-bold text-[1rem] hover:text-primary transition-colors duration-300">
+                                Let's work together 
+                                <i className="fas fa-arrow-right text-primary ml-2.5"></i>
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* --- VALUES SECTION --- */}
+                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8 py-16 px-[8%] bg-white">
+                        <div className="value-card-hover p-10 rounded-[24px] bg-bgColor border border-transparent">
+                            <i className="fas fa-gem text-[2rem] text-primary mb-5 block"></i>
+                            <h3 className="text-xl font-bold mb-3">Quality First</h3>
+                            <p className="text-textLight">I don't just build websites; I craft experiences with pixel-perfect attention to detail.</p>
+                        </div>
+                        <div className="value-card-hover p-10 rounded-[24px] bg-bgColor border border-transparent">
+                            <i className="fas fa-bolt text-[2rem] text-primary mb-5 block"></i>
+                            <h3 className="text-xl font-bold mb-3">Fast Performance</h3>
+                            <p className="text-textLight">Optimized code and lightweight architecture for lightning-fast load times.</p>
+                        </div>
+                        <div className="value-card-hover p-10 rounded-[24px] bg-bgColor border border-transparent">
+                            <i className="fas fa-sync text-[2rem] text-primary mb-5 block"></i>
+                            <h3 className="text-xl font-bold mb-3">Agile Mindset</h3>
+                            <p className="text-textLight">Adapting quickly to new challenges and iterating until the solution is perfect.</p>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        // --- PAGE: MARKETPLACE ---
+
+        const Marketplace = () => {
+            const [filter, setFilter] = useState('all');
+            const projectData = [
+                { id: 1, category: 'python', tag: 'AI/ML', icon: 'fab fa-python', title: 'PyVision Analytics', rating: 4.9, desc: 'Advanced data visualization engine using Matplotlib and Pandas.', tech: ['Python', 'Pandas'], price: '₹49.00' },
+                { id: 2, category: 'js', tag: 'SaaS', icon: 'fab fa-js-square', title: 'TaskFlow Dashboard', rating: 4.2, desc: 'A high-performance Kanban board with drag-and-drop features.', tech: ['JS', 'Tailwind'], price: '₹29.00' },
+                { id: 3, category: 'cpp', tag: 'System', icon: 'fas fa-code', title: 'UltraOS Kernel Mock', rating: 5.0, desc: 'Simulation of process scheduling and memory management.', tech: ['C++', 'Memory Mgmt'], price: '₹75.00' },
+                { id: 4, category: 'web', tag: 'UI Kit', icon: 'fab fa-html5', title: 'GoldLux Components', rating: 4.7, desc: '100+ Premium HTML/CSS/Tailwind components.', tech: ['HTML', 'CSS'], price: '₹19.00' },
+                { id: 5, category: 'cpp', tag: 'Utility', icon: 'fas fa-microchip', title: 'FastCrypt Engine', rating: 4.0, desc: 'Lightweight encryption/decryption library optimized for C.', tech: ['C', 'Security'], price: '₹35.00' }
+            ];
+
+            const filteredProjects = filter === 'all' ? projectData : projectData.filter(p => p.category === filter);
+
+            return (
+                <div className="pt-32 pb-20 px-[5%] animate-fadeInUp">
+                    <header className="text-center mb-16">
+                        <h1 className="text-5xl font-extrabold mb-4">Project <span className="text-primary">Marketplace</span></h1>
+                        <p className="text-textLight text-lg">Premium source code and technical solutions.</p>
+                    </header>
+
+                    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-10">
+                        <aside className="lg:sticky lg:top-32 h-fit">
+                            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                                <h3 className="text-lg font-bold mb-5 border-l-4 border-primary pl-3">Technologies</h3>
+                                <ul className="flex flex-wrap lg:flex-col gap-2">
+                                    {['all', 'python', 'js', 'cpp', 'web'].map(cat => (
+                                        <li key={cat} 
+                                            onClick={() => setFilter(cat)}
+                                            className={`px-4 py-2 rounded-xl cursor-pointer transition-all capitalize ${filter === cat ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-gray-50 text-textLight'}`}>
+                                            {cat === 'all' ? 'All Projects' : cat === 'js' ? 'JavaScript' : cat === 'cpp' ? 'C / C++' : cat === 'web' ? 'HTML/CSS' : cat}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </aside>
+
+                        <main className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                            {filteredProjects.map(project => (
+                                <div key={project.id} className="bg-white rounded-[30px] overflow-hidden border border-gray-50 product-card-hover group flex flex-col">
+                                    <div className="h-48 bg-slate-50 relative flex items-center justify-center">
+                                        <i className={`${project.icon} text-6xl text-slate-200 group-hover:scale-110 transition-transform duration-500`}></i>
+                                        <span className="absolute top-5 right-5 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">{project.tag}</span>
+                                    </div>
+                                    <div className="p-6 flex-grow">
+                                        <div className="text-primary text-sm mb-2">
+                                            {[...Array(5)].map((_, i) => <i key={i} className={`${i < Math.floor(project.rating) ? 'fas' : 'far'} fa-star`}></i>)}
+                                            <span className="ml-2 text-textLight">({project.rating})</span>
+                                        </div>
+                                        <h2 className="text-xl font-bold mb-3">{project.title}</h2>
+                                        <p className="text-textLight text-sm leading-relaxed mb-4">{project.desc}</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {project.tech.map(t => <span key={t} className="text-[10px] bg-gray-50 border border-gray-100 px-2 py-1 rounded font-bold uppercase">{t}</span>)}
+                                        </div>
+                                    </div>
+                                    <div className="p-6 border-t border-gray-50 flex justify-between items-center">
+                                        <span className="font-bold text-xl">{project.price}</span>
+                                        <button className="bg-textDark text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-primary transition-colors">Details</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- PAGE: CONTACT ---
+
+        const Contact = () => {
+            const [status, setStatus] = useState('idle');
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setStatus('sending');
+                setTimeout(() => { setStatus('success'); setTimeout(() => setStatus('idle'), 3000); }, 1500);
+            };
+
+            return (
+                <section className="min-h-screen flex items-center justify-center px-[8%] pt-32 pb-20 animate-fadeInUp">
+                    <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16 max-w-6xl w-full items-center">
+                        <div className="space-y-8">
+                            <h1 className="text-5xl md:text-6xl font-bold leading-tight">Let's Connect & <br/><span className="text-primary">Build Together.</span></h1>
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-5 p-5 bg-white rounded-2xl info-card-shadow transition-all hover:scale-[1.03]">
+                                    <i className="fas fa-envelope text-2xl text-primary"></i>
+                                    <div><strong className="block text-lg">Email Me</strong><p className="text-textLight">hello@hemadharishini.com</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="glass-card enquiry-glow p-8 md:p-12 rounded-[30px] relative">
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <input type="text" required className="w-full px-5 py-4 bg-white border-2 border-transparent rounded-xl focus:border-primary focus:outline-none" placeholder="First Name" />
+                                <input type="email" required className="w-full px-5 py-4 bg-white border-2 border-transparent rounded-xl focus:border-primary focus:outline-none" placeholder="Email Address" />
+                                <textarea className="w-full h-32 px-5 py-4 bg-white border-2 border-transparent rounded-xl focus:border-primary focus:outline-none resize-none" placeholder="Your Message"></textarea>
+                                <button type="submit" disabled={status !== 'idle'} className={`w-full py-5 rounded-xl font-bold text-white transition-all ${status === 'success' ? 'bg-green-600' : 'bg-primary hover:bg-primaryHover'}`}>
+                                    {status === 'idle' ? 'Send Enquiry' : status === 'sending' ? 'Sending...' : 'Sent Successfully!'}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // --- MAIN APP ---
+
+        const App = () => {
+            const [page, setPage] = useState('home');
+
+            return (
+                <div className="flex flex-col min-h-screen">
+                    <Nav currentPage={page} setPage={setPage} />
+                    <main className="flex-grow">
+                        {page === 'home' && <Home setPage={setPage} />}
+                        {page === 'about' && <About setPage={setPage} />}
+                        {page === 'marketplace' && <Marketplace />}
+                        {page === 'contact' && <Contact />}
+                    </main>
+                    <Footer setPage={setPage} />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
